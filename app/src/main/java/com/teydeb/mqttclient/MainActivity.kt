@@ -14,6 +14,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(),  UIUpdaterInterface  {
 
     var mqttManager:MQTTmanager? = null
+    var nextId = 0
+
     // Interface methods
     override fun resetUIWithConnection(status: Boolean) {
 
@@ -25,13 +27,14 @@ class MainActivity : AppCompatActivity(),  UIUpdaterInterface  {
         // Update the status label.
         if (status){
             updateStatusViewWith("Connected")
+
         }else{
             updateStatusViewWith("Disconnected")
         }
     }
 
     override fun updateStatusViewWith(status: String) {
-        statusLabl.text = status
+        statusLabl.text = "$status-tester$nextId"
     }
 
     var count:Float = 3f
@@ -81,13 +84,14 @@ class MainActivity : AppCompatActivity(),  UIUpdaterInterface  {
         resetUIWithConnection(false)
         mqttManager?.disconnect()
     }
-
     fun connect(view: View){
 
         if (!(ipAddressField.text.isNullOrEmpty() && topicField.text.isNullOrEmpty())) {
             var host = "tcp://" + ipAddressField.text.toString()
             var topic = topicField.text.toString()
-            var connectionParams = MQTTConnectionParams("1",host,topic,"tester1","tester1")
+            nextId = java.util.Random().nextInt(100) + 800
+
+            var connectionParams = MQTTConnectionParams("$nextId",host,topic,"tester$nextId","tester$nextId")
             mqttManager = MQTTmanager(connectionParams,applicationContext,this)
             mqttManager?.connect()
         }else{
