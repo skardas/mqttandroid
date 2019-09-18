@@ -19,9 +19,9 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
             override fun connectComplete(b:Boolean, s:String) {
                 uiUpdater?.resetUIWithConnection(true)
             }
-            override fun connectionLost(throwable:Throwable) {
-                if(uiUpdater != null)
-                    uiUpdater.resetUIWithConnection(false)
+            override fun connectionLost(throwable:Throwable?) {
+              //  if(uiUpdater != null)
+                 //   uiUpdater?.resetUIWithConnection(false)
             }
             override fun messageArrived(topic:String, mqttMessage: MqttMessage) {
                 uiUpdater?.update(mqttMessage.toString())
@@ -39,8 +39,8 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
         try
         {
             var params = this.connectionParams
-            client.connect(mqttConnectOptions, null, object: IMqttActionListener {
-                override fun onSuccess(asyncActionToken:IMqttToken) {
+            client.connect(mqttConnectOptions, context, object: IMqttActionListener {
+                override fun onSuccess(asyncActionToken:IMqttToken?) {
                     val disconnectedBufferOptions = DisconnectedBufferOptions()
                     disconnectedBufferOptions.isBufferEnabled = true
                     disconnectedBufferOptions.bufferSize = 100
@@ -50,7 +50,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
                     subscribe(params.topic)
 
                 }
-                override fun onFailure(asyncActionToken:IMqttToken, exception:Throwable) {
+                override fun onFailure(asyncActionToken:IMqttToken?, exception:Throwable) {
                     Log.w("Mqtt", "Failed to connect to: " + params.host + exception.toString())
                 }
             })
@@ -62,7 +62,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
 
     fun disconnect(){
         try {
-            client.disconnect(null,object :IMqttActionListener{
+            client.disconnect(context,object :IMqttActionListener{
                 /**
                  * This method is invoked when an action has completed successfully.
                  * @param asyncActionToken associated with the action that has completed
@@ -96,7 +96,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
     fun subscribe(topic: String){
         try
         {
-            client.subscribe(topic, 0, null, object:IMqttActionListener {
+            client.subscribe(topic, 0, context, object:IMqttActionListener {
                 override fun onSuccess(asyncActionToken:IMqttToken) {
                     Log.w("Mqtt", "Subscription!")
                     uiUpdater?.updateStatusViewWith("Subscribed to Topic")
@@ -118,7 +118,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
 
         try
         {
-            client.unsubscribe(topic,null,object :IMqttActionListener{
+            client.unsubscribe(topic,context,object :IMqttActionListener{
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     uiUpdater?.updateStatusViewWith("UnSubscribed to Topic")
                 }
