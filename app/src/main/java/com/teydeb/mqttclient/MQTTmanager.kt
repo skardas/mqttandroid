@@ -21,7 +21,7 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
             }
             override fun connectionLost(throwable:Throwable?) {
               //  if(uiUpdater != null)
-                 //   uiUpdater?.resetUIWithConnection(false)
+                 uiUpdater?.resetUIWithConnection(false)
             }
             override fun messageArrived(topic:String, mqttMessage: MqttMessage) {
                 uiUpdater?.update(mqttMessage.toString())
