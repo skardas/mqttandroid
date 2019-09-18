@@ -17,14 +17,13 @@ class MQTTmanager (val connectionParams: MQTTConnectionParams, val context: Cont
 
         client.setCallback(object: MqttCallbackExtended {
             override fun connectComplete(b:Boolean, s:String) {
-                Log.w("mqtt", s)
                 uiUpdater?.resetUIWithConnection(true)
             }
             override fun connectionLost(throwable:Throwable) {
-                uiUpdater?.resetUIWithConnection(false)
+                if(uiUpdater != null)
+                    uiUpdater.resetUIWithConnection(false)
             }
             override fun messageArrived(topic:String, mqttMessage: MqttMessage) {
-                Log.w("Mqtt", mqttMessage.toString())
                 uiUpdater?.update(mqttMessage.toString())
             }
             override fun deliveryComplete(iMqttDeliveryToken: IMqttDeliveryToken) {
